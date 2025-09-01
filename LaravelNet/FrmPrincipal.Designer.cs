@@ -28,12 +28,67 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "Form1";
+            txtRutaBase = new TextBox();
+            treeProyectos = new TreeView();
+            btnExaminar = new Button();
+            btnCargar = new Button();
+            SuspendLayout();
+            // 
+            // txtRutaBase
+            // 
+            txtRutaBase.Location = new Point(24, 29);
+            txtRutaBase.Name = "txtRutaBase";
+            txtRutaBase.Size = new Size(395, 23);
+            txtRutaBase.TabIndex = 0;
+            // 
+            // treeProyectos
+            // 
+            treeProyectos.Location = new Point(24, 101);
+            treeProyectos.Name = "treeProyectos";
+            treeProyectos.Size = new Size(395, 455);
+            treeProyectos.TabIndex = 1;
+            // 
+            // btnExaminar
+            // 
+            btnExaminar.Location = new Point(24, 58);
+            btnExaminar.Name = "btnExaminar";
+            btnExaminar.Size = new Size(96, 37);
+            btnExaminar.TabIndex = 2;
+            btnExaminar.Text = "Examinar";
+            btnExaminar.UseVisualStyleBackColor = true;
+            btnExaminar.Click += btnExaminar_Click;
+            // 
+            // btnCargar
+            // 
+            btnCargar.Location = new Point(328, 58);
+            btnCargar.Name = "btnCargar";
+            btnCargar.Size = new Size(91, 36);
+            btnCargar.TabIndex = 3;
+            btnCargar.Text = "Cargar";
+            btnCargar.UseVisualStyleBackColor = true;
+            btnCargar.Click += btnCargar_Click;
+            // 
+            // FrmPrincipal
+            // 
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(445, 568);
+            Controls.Add(btnCargar);
+            Controls.Add(btnExaminar);
+            Controls.Add(treeProyectos);
+            Controls.Add(txtRutaBase);
+            Name = "FrmPrincipal";
+            Text = "Proyectos Laravel";
+            Load += FrmPrincipal_Load;
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
+
+        private TextBox txtRutaBase;
+        private TreeView treeProyectos;
+        private Button btnExaminar;
+        private Button btnCargar;
     }
 }
