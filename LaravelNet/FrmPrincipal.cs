@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace LaravelNet
 {
     public partial class FrmPrincipal : Form
@@ -13,6 +15,44 @@ namespace LaravelNet
             txtRutaBase.Text = Properties.Settings.Default.RutaBase;
         }
 
+        private void EjecutarArtisan(string rutaProyecto, string comando)
+        {
+            try
+            {
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = $"/c php artisan {comando}",
+                    WorkingDirectory = rutaProyecto,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using (Process proceso = new Process())
+                {
+                    proceso.StartInfo = psi;
+                    proceso.Start();
+
+                    string salida = proceso.StandardOutput.ReadToEnd();
+                    string error = proceso.StandardError.ReadToEnd();
+
+                    proceso.WaitForExit();
+
+                    txtSalida.AppendText($">>> php artisan {comando}\n");
+                    txtSalida.AppendText(salida + "\n");
+                    if (!string.IsNullOrWhiteSpace(error))
+                        txtSalida.AppendText("ERROR: " + error + "\n");
+                    txtSalida.AppendText("---------------------------------------------------\n");
+                }
+            }
+            catch (Exception ex)
+            {
+                txtSalida.AppendText("Excepción: " + ex.Message + "\n");
+            }
+        }
+        
         private void btnExaminar_Click(object sender, EventArgs e)
         {
             using (FolderBrowserDialog fbd = new FolderBrowserDialog())
@@ -67,7 +107,7 @@ namespace LaravelNet
         {
             string ruta = Path.Combine(rutaBase, subCarpeta);
 
-            if (Directory.Exists(ruta)) 
+            if (Directory.Exists(ruta))
             {
                 var nodo = new TreeNode(Path.GetFileName(subCarpeta)) { Tag = ruta };
                 nodoPadre.Nodes.Add(nodo);
@@ -107,6 +147,60 @@ namespace LaravelNet
         {
             Properties.Settings.Default.RutaBase = txtRutaBase.Text;
             Properties.Settings.Default.Save();
+        }
+
+        private void btnRutas_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(txtProyectoActivo.Text) || txtProyectoActivo.Tag == null)
+            {
+                MessageBox.Show("Selecciona un proyecto primero.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            string rutaProyecto = txtProyectoActivo.Tag.ToString();
+            EjecutarArtisan(rutaProyecto, "route:list");
+        }
+        private void btnMigrar_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(txtProyectoActivo.Text) || txtProyectoActivo.Tag == null)
+            {
+                MessageBox.Show("Selecciona un proyecto primero.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            string rutaProyecto = txtProyectoActivo.Tag.ToString();
+            EjecutarArtisan(rutaProyecto, "migrate");
+        }
+
+        private void btnEstadoMigraciones_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(txtProyectoActivo.Text) || txtProyectoActivo.Tag == null)
+            {
+                MessageBox.Show("Selecciona un proyecto primero.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            string rutaProyecto = txtProyectoActivo.Tag.ToString();
+            EjecutarArtisan(rutaProyecto, "migrate:status");
+        }
+
+        private void treeProyectos_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            string ruta = e.Node.Tag?.ToString();
+
+            if (ruta != null)
+            {
+                // Buscar la raíz del proyecto (donde está artisan)
+                string rutaProyecto = ruta;
+                while (!File.Exists(Path.Combine(rutaProyecto, "artisan")) && Directory.Exists(rutaProyecto))
+                {
+                    rutaProyecto = Directory.GetParent(rutaProyecto)?.FullName;
+                    if (rutaProyecto == null) return;
+                }
+
+                txtProyectoActivo.Text = Path.GetFileName(rutaProyecto);
+                txtProyectoActivo.Tag = rutaProyecto; // guardamos la ruta completa en Tag
+            }
         }
     }
 }
