@@ -36,21 +36,22 @@
             // 
             // txtRutaBase
             // 
-            txtRutaBase.Location = new Point(24, 29);
+            txtRutaBase.Location = new Point(12, 27);
             txtRutaBase.Name = "txtRutaBase";
             txtRutaBase.Size = new Size(395, 23);
             txtRutaBase.TabIndex = 0;
             // 
             // treeProyectos
             // 
-            treeProyectos.Location = new Point(24, 101);
+            treeProyectos.Location = new Point(12, 99);
             treeProyectos.Name = "treeProyectos";
-            treeProyectos.Size = new Size(395, 455);
+            treeProyectos.Size = new Size(194, 455);
             treeProyectos.TabIndex = 1;
+            treeProyectos.NodeMouseDoubleClick += treeProyectos_NodeMouseDoubleClick;
             // 
             // btnExaminar
             // 
-            btnExaminar.Location = new Point(24, 58);
+            btnExaminar.Location = new Point(12, 56);
             btnExaminar.Name = "btnExaminar";
             btnExaminar.Size = new Size(96, 37);
             btnExaminar.TabIndex = 2;
@@ -60,7 +61,7 @@
             // 
             // btnCargar
             // 
-            btnCargar.Location = new Point(328, 58);
+            btnCargar.Location = new Point(114, 56);
             btnCargar.Name = "btnCargar";
             btnCargar.Size = new Size(91, 36);
             btnCargar.TabIndex = 3;
@@ -72,13 +73,15 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(445, 568);
+            ClientSize = new Size(1217, 571);
             Controls.Add(btnCargar);
             Controls.Add(btnExaminar);
             Controls.Add(treeProyectos);
             Controls.Add(txtRutaBase);
             Name = "FrmPrincipal";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Proyectos Laravel";
+            FormClosing += FrmPrincipal_FormClosing;
             Load += FrmPrincipal_Load;
             ResumeLayout(false);
             PerformLayout();

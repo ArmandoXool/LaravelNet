@@ -9,16 +9,20 @@ namespace LaravelNet
         private void FrmPrincipal_Load(object sender, EventArgs e)
         {
             // Ruta base por defecto
-            txtRutaBase.Text = @"C:\WebPHP744\htdocs";
+            //txtRutaBase.Text = @"C:\WebPHP744\htdocs";
+            txtRutaBase.Text = Properties.Settings.Default.RutaBase;
         }
 
         private void btnExaminar_Click(object sender, EventArgs e)
         {
-            using (var folderDialog = new FolderBrowserDialog())
+            using (FolderBrowserDialog fbd = new FolderBrowserDialog())
             {
-                if (folderDialog.ShowDialog() == DialogResult.OK)
+                fbd.Description = "Selecciona la ruta base de Laravel";
+                if (fbd.ShowDialog() == DialogResult.OK)
                 {
-                    txtRutaBase.Text = folderDialog.SelectedPath;
+                    Properties.Settings.Default.RutaBase = fbd.SelectedPath;
+                    Properties.Settings.Default.Save();
+                    txtRutaBase.Text = fbd.SelectedPath;
                 }
             }
         }
@@ -63,11 +67,46 @@ namespace LaravelNet
         {
             string ruta = Path.Combine(rutaBase, subCarpeta);
 
-            if (Directory.Exists(ruta))
+            if (Directory.Exists(ruta)) 
             {
-                var nodo = new TreeNode(subCarpeta) { Tag = ruta };
+                var nodo = new TreeNode(Path.GetFileName(subCarpeta)) { Tag = ruta };
                 nodoPadre.Nodes.Add(nodo);
+
+                // Agregar subcarpetas
+                foreach (var dir in Directory.GetDirectories(ruta))
+                {
+                    var subNodo = new TreeNode(Path.GetFileName(dir)) { Tag = dir };
+                    nodo.Nodes.Add(subNodo);
+                }
+
+                // Agregar archivos
+                foreach (var file in Directory.GetFiles(ruta))
+                {
+                    string ext = Path.GetExtension(file).ToLower();
+                    if (ext == ".php" || ext == ".blade.php" || ext == ".json" || Path.GetFileName(file) == ".env")
+                    {
+                        var subNodo = new TreeNode(Path.GetFileName(file)) { Tag = file };
+                        nodo.Nodes.Add(subNodo);
+                    }
+                }
             }
+        }
+        private void treeProyectos_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            string? ruta = e.Node.Tag?.ToString();
+            if (ruta != null)
+            {
+                if (Directory.Exists(ruta))
+                    System.Diagnostics.Process.Start("cmd.exe", $"/c code \"{ruta}\"");
+                else if (File.Exists(ruta))
+                    System.Diagnostics.Process.Start("cmd.exe", $"/c code \"{ruta}\"");
+            }
+        }
+
+        private void FrmPrincipal_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Properties.Settings.Default.RutaBase = txtRutaBase.Text;
+            Properties.Settings.Default.Save();
         }
     }
 }
